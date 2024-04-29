@@ -1,0 +1,20 @@
+//@version=5
+indicator("ATR Stops", overlay=true)
+// Get inputs
+atrLength = input.int(title="ATR Length", defval=3, minval=1)
+useStructure = input.bool(title="Use Structure?", defval=true)
+lookback = input.int(title="How Far To Look Back For High/Lows", defval=100, minval=1)
+atrStopMultiplier = input.float(title="ATR Multiplier",  defval=1.0, minval=0.1)
+// Calculate data
+atr = ta.atr(atrLength)
+lowestLow = ta.lowest(low, lookback)
+highestHigh = ta.highest(high, lookback)
+longStop = (useStructure ? lowestLow : close) - atr * atrStopMultiplier
+shortStop = (useStructure ? highestHigh : close) + atr * atrStopMultiplier
+// Draw data to chart
+entry =  (((useStructure ? lowestLow : close) - (atr*0.57) * atrStopMultiplier)*1.005)
+shortEntry =  (((useStructure ? highestHigh : close) + (atr*0.57) * atrStopMultiplier)*0.995)
+plot(shortEntry, color=color.orange, title="Short Entry")
+plot(entry, color=color.aqua, title="Entry")
+plot(longStop, color=color.green, title="Long Trailing Stop")
+plot(shortStop, color=color.red, title="Short Trailing Stop")
